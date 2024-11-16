@@ -1,0 +1,181 @@
+---
+title: "Project2"
+output: html_document
+date: "2024-11-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Project 2
+
+## Question 1
+
+**Introduce the context of your dataset and describe its source(s). Include hyperlink(s) for where you retrieved it from as well as a picture (with citation directly below the image) related to your topic. Why did you pick this dataset to analyze, and what will you be investigating?**
+
+This dataset is the stats of the top 500 players in the NBA. This is where I got my [data](https://www.basketball-reference.com/leagues/NBA_2024_per_game.html).
+
+![](Downloads/NBA-Top-100-player-rankings-for-2024-25-season-10-1.jpg.webp){width="353"}
+
+picture found [here](https://www.google.com/url?sa=i&url=https%3A%2F%2Fclutchpoints.com%2Fnba-top-100-player-rankings-2024-25-season-10-1&psig=AOvVaw28DBJAbi3Kcal35UDolONC&ust=1731702097249000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCJCn_JnT3IkDFQAAAAAdAAAAABAE).
+
+I picked this dataset because this is something that is interesting to me and I feel that I will get more involved using this dataset. I will be investigating the player's stats like points, rebounds, assists, etc.
+
+## Question 2
+
+**Data Preparation: Describe how you obtained the data and imported it into R (either what specifically you downloaded or how you scraped it). Then detail the steps you took to process your data (e.g., what you did do with NA values, dates, factors, strings, renaming variables, etc.?).  Include a brief description of the challenges you faced when preparing the data.** 
+
+I obtained the data by going on a website called basketball reference and downloaded the data from there. There wasn't too much processing to do, since it was already sorted. I just had to remove some of the player's which had multiple rows since they got traded in the middle of the season so they had average stats from both teams. There wasn't that many challenges it was just tedious to do it manually.
+
+## Question 3
+
+**Variable Descriptions: Create a subset of your “cleaned dataset” (final version after all merging, variable creation, renaming, formatting, etc.) that only includes the variables of interest. Make a nicely formatted table that includes the name of each variable, its type, and a brief description.**
+
+```{r question 3}
+library(ggplot2)
+library(dplyr)
+library(rvest)
+nba_stats <- read.csv("sportsref_download.csv")
+
+nba_cleaned <- nba_stats |>
+  select(2, 3, 5, 11, 14, 21, 24, 25, 28, 30)
+
+
+
+```
+
+## Question 4
+
+**Univariate Analyses**: Choose at least 4 of your variables and create univariate (1 variable) graphs to display them. Provide a brief description of the distribution, including relevant descriptive statistics, to go along with each graph.
+
+```{r question 4}
+# Plot for Points
+ggplot(nba_cleaned, aes(x = PTS)) +
+  geom_histogram(binwidth = 1, fill = "skyblue", color = "black") +
+  labs(title = "Distribution of Points", x = "Points", y = "Frequency") +
+  theme_minimal()
+
+# Plot for Rebounds
+ggplot(nba_cleaned, aes(x = TRB)) +
+  geom_histogram(binwidth = 1, fill = "orange", color = "black") +
+  labs(title = "Distribution of Rebounds", x = "Rebounds", y = "Frequency") +
+  theme_minimal()
+
+# Plot for Assists
+ggplot(nba_cleaned, aes(x = AST)) +
+  geom_histogram(binwidth = 1, fill = "purple", color = "black") +
+  labs(title = "Distribution of Assists", x = "Assists", y = "Frequency") +
+  theme_minimal()
+
+# Plot for Age
+ggplot(nba_cleaned, aes(x = Age)) +
+  geom_histogram(binwidth = 1, fill = "green", color = "black") +
+  labs(title = "Distribution of Age", x = "Age", y = "Frequency") +
+  theme_minimal()
+
+mean(nba_cleaned$PTS)
+mean(nba_cleaned$TRB)
+mean(nba_cleaned$AST)
+mean(nba_cleaned$Age)
+
+median(nba_cleaned$PTS)
+median(nba_cleaned$TRB)
+median(nba_cleaned$AST)
+median(nba_cleaned$Age)
+```
+
+The relevant statistics are displayed above, the mean points scored in the dataset is `r mean(nba_cleaned$PTS, na.rm = TRUE)` and the median is 8.75. The mean points scored in the dataset is `r mean(nba_cleaned$TRB, na.rm = TRUE)`. and the median is 3.6. The mean for Assists is 2.5184 and the median is 1.9. The mean for the Age of the players is 26.49 and the median is 26.
+
+## Question 5
+
+**Bivariate Analyses**: Create at least 4 bivariate (2 variables) graphs to display the relationships among your variables of interest.  Provide a brief description of what your plots show, including bivariate descriptive statistics.
+
+```{r question 5}
+#boxplot of rebounds and position
+ggplot(nba_cleaned, aes(x = Pos, y = TRB)) +
+  geom_boxplot() +
+  labs(title = "Total Rebounds by Player Position", x = "Position", y = "Total Rebounds") +
+  theme_minimal()
+
+ggplot(nba_cleaned, aes(x = TOV, y = AST)) +
+  geom_point() +
+  labs(title = "Total Turnovers compared to Assists", x = "Turnovers", y = "Total Assists") +
+  theme_minimal()
+
+
+
+ggplot(nba_cleaned, aes(x = PTS, y = Age)) +
+  geom_point() +
+  labs(title = "PLayer Age Compared to PPG", x = "Points Per Game", y = "Age") +
+  theme_minimal()
+
+ggplot(nba_cleaned, aes(x = FG., y = FT.)) +
+  geom_boxplot() +
+  labs(title = "PLayer FG% Compared to FT%", x = "Feild Goal Percentage", y = "Free Throw Percentage") +
+  theme_minimal()
+
+
+
+
+#multivariate plot
+ggplot(nba_cleaned, aes(x = AST, y = PTS, color = Pos)) +
+  geom_point(size = 3, alpha = 0.7) +
+  labs(
+    title = "Points vs Assists by Player Position",
+    x = "Assists (AST)",
+    y = "Points (PTS)",
+    color = "Position"
+  ) +
+  theme_minimal()
+
+```
+
+The first plot shows the correlation between the total rebounds per game of players based on their positions on the court. The means for the centers is higher than the rest because they are the tallest and usually the ones who get rebounds on the team. The second graph shows the correlation between Turnovers and Assists. The correlation coefficient between TRB and AST is `r cor(nba_cleaned$TRB, nba_cleaned$AST)`. The third graph shows the correlation between the Points per game for each player based on how old they are. The correlation coefficient between PTS and Age is `r cor(nba_cleaned$PTS, nba_cleaned$Age)` . The last graph is the correlation between the player's FG% and their FT%. The correlation coefficient between FT% and FG% is `r cor(nba_cleaned$FT., nba_cleaned$FG.)`.
+
+## Question 6
+
+This is the hyperlink to my Github [Repository](https://github.com/Soumil-A/Project2.git). This contains my RMD file for this project as well as my HTML file which can both be used to reproduce my code and project.
+
+## Question 7
+
+To start off, I used choice A. Twice in the univariate plot description and twice in the bivariate plot description. Then I did choice E below showing how many N/A values there are for each stat. This could've happened because some positions don't have some stats, for example, most centers don't shoot threes so 3PT% would be NA. Next option is option I. I made a multivariate plot as seen above which shows a very strong correlation between the position and their points and assists. Next was choice G where I made sure all the capitalization was consistent as shown below. Last was choice C where I reshaped the dataset as shown below so it is more clean and easier to read. I reshaped PTS, TRB, and AST.
+
+```{r}
+# Choice E
+na_counts <- sapply(nba_cleaned, function(x) sum(is.na(x)))
+na_summary <- data.frame(
+  Variable = names(na_counts),
+  NA_Count = na_counts
+)
+print(na_summary)
+
+
+#choice G
+library(stringr)
+nba_cleaned$Player <- str_to_title(nba_cleaned$Player)
+head(nba_cleaned$Player)
+
+
+#choice C
+library(tidyr)
+nba_long <- nba_cleaned %>%
+  pivot_longer(
+    cols = c(PTS, TRB, AST),  
+    names_to = "Statistic",  
+    values_to = "Value"       
+  )
+head(nba_long)
+
+
+```
+
+## Question 8
+
+We discovered important correlations between a number of performance measures in the \`nba_cleaned\` dataset. Players that score more also typically assist more, which is consistent with the playmaking responsibilities of guards and forwards, according to the positive connection between points (PTS) and assists (AST). As may be predicted given their dominant rebounding role, centers (C) had the most median rebounds (TRB). Free Throw Percentage (FT.) and Field Goal Percentage (FG.) showed a moderately positive association, indicating that accurate shooters typically do well in both categories. The notion that younger players generally score more is further supported by the somewhat greater point totals of younger players. Overall, the study supported the predicted trends, showing that age and position had an impact on important performance indicators.
+
+## Question 9 (references)
+
+<https://www.basketball-reference.com/leagues/NBA_2024_per_game.html>
+
+<https://www.google.com/url?sa=i&url=https%3A%2F%2Fclutchpoints.com%2Fnba-top-100-player-rankings-2024-25-season-10-1&psig=AOvVaw28DBJAbi3Kcal35UDolONC&ust=1731702097249000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCJCn_JnT3IkDFQAAAAAdAAAAABAE>
